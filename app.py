@@ -283,4 +283,3 @@ def initialize():
         db.create_all()              
         load_customer_data()        
         load_product_data_once() 
-app = app
