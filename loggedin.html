@@ -95,7 +95,7 @@
         <img src="{{ product.image_url }}" class="card-img-top" alt="{{ product.Product_Id }}" style="height: 200px; object-fit: cover;">
         <div class="card-body">
           <h5 class="card-title">{{ product.Category[:12] }}{% if product.Subcategory|length > 12 %}...{% endif %}</h5>
-          <p class="card-text">Brand: {{ product.Brand }}</p>
+          <p class="card-text">{{ product.Brand }}</p>
           <button class="btn btn-primary" data-toggle="modal" data-target="#productModal{{ product.id }}">Buy Now</button>
         </div>
       </div>
@@ -114,7 +114,7 @@
                 <img src="{{ product.image_url }}" class="img-fluid" alt="{{ product.Category }}" style="height: 200px;">
               </div>
               <div class="col-md-8">
-                <p><strong>Brand:</strong> {{ product.Brand }}</p>
+                <p>{{ product.Brand }}</p>
                 <p><strong>Rating:</strong> {{ product.Product_Rating }}</p>
                 <p><strong>Price:</strong> ₹{{ product.Price }}</p>
               </div>
