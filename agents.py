@@ -90,7 +90,7 @@ def recommendation_agent(customer_id):
     if not customer:
         return []
 
-    products = Products.query.limit(10).all()
+    products = Products.query.limit(20).all()
     product_info = ""
     for p in products:
         product_info += f"ID: {p.Product_Id}, Brand: {p.Brand}, Category: {p.Category}, Rating: {p.Product_Rating}, Holiday: {p.Holiday}, Season: {p.Season}\n"
