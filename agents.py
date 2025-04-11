@@ -90,7 +90,7 @@ def recommendation_agent(customer_id):
     if not customer:
         return []
 
-    products = Products.query.limit(20).all()
+    products = Products.query.limit(10).all()
     product_info = ""
     for p in products:
         product_info += f"ID: {p.Product_Id}, Brand: {p.Brand}, Category: {p.Category}, Rating: {p.Product_Rating}, Holiday: {p.Holiday}, Season: {p.Season}\n"
@@ -109,7 +109,7 @@ def recommendation_agent(customer_id):
     Product Catalog:
     {product_info}
 
-    Based on this, return a list of 20 Product_IDs that are most relevant to the customer.
+    Based on this, return a list of 10 Product_IDs that are most relevant to the customer.
     Format your answer as a Python list of strings. Example: ["P2001", "P2005"]
     """
 
