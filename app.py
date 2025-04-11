@@ -82,7 +82,7 @@ def main():
     try:
         product_ids = ast.literal_eval(response)  # if it's a stringified list
     except:
-        product_ids = response.split()  # fallback if they're space-separated
+        product_ids = response.split()  # if they're space-separated
 
     recommended_products = Products.query.filter(Products.Product_Id.in_(product_ids)).all()
     return render_template('main.html', recommended_products=recommended_products, cid=customer_id)
