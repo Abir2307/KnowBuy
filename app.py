@@ -80,9 +80,12 @@ def main():
     customer_id = request.form.get('cid')
     response = recommendation_agent(customer_id)
     try:
-        product_ids = ast.literal_eval(response)  # if it's a stringified list
+        product_ids = ast.literal_eval(response)
+        if not isinstance(product_ids, list):  # Make sure it's a list
+            raise ValueError("Not a list")
     except:
-        product_ids = response.split()  # if they're space-separated
+        flash("Sorry! Recommendation engine failed. Showing trending products instead.", "warning")
+        product_ids = [p.Product_Id for p in Products.query.order_by(Products.recommendation_prob.desc()).limit(20).all()]
 
     recommended_products = Products.query.filter(Products.Product_Id.in_(product_ids)).all()
     return render_template('main.html', recommended_products=recommended_products, cid=customer_id)
