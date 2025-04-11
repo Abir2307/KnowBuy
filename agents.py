@@ -18,16 +18,9 @@ def query_mistral(prompt, model="mistralai/mistral-7b-instruct", stream=False):
         "stream": stream
     }
     try:
-        response = requests.post(OPENROUTER_API_KEY, headers=headers, json=data)
-        # Check HTTP status code
-        if response.status_code != 200:
-            return f"API Error: {response.status_code} - {response.text}"
-
+        response = requests.post(OPENROUTER_URL, headers=headers, json=data)
         response_json = response.json()
-        # Log the full response for debugging
-        print("API Response:", response_json)
-
-        # Check if 'choices' exists
+        
         if "choices" not in response_json:
             return f"Unexpected response format: {response_json}"
 
