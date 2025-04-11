@@ -1,7 +1,6 @@
 import requests
 from models import Customer, Products,Cart
 from sqlalchemy.orm import joinedload
-from sqlalchemy.orm import joinedload
 
 OLLAMA_API_URL = "http://localhost:11434/api/generate"
 
