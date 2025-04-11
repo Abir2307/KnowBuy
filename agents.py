@@ -109,7 +109,7 @@ def recommendation_agent(customer_id):
     Product Catalog:
     {product_info}
 
-    Based on this, return a list of 8 Product_IDs that are most relevant to the customer.
+    Based on this, return a list of 20 Product_IDs that are most relevant to the customer.
     Format your answer as a Python list of strings. Example: ["P2001", "P2005"]
     """
 
