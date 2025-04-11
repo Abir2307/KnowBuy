@@ -13,7 +13,7 @@ def query_mistral(prompt, model="mistral-7b-instruct", stream=False):
     }
 
     data = {
-        "model": model,
+        "model": f"openrouter/{model}",
         "messages": [{"role": "user", "content": prompt}],
         "stream": stream
     }
