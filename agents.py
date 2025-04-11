@@ -19,13 +19,6 @@ def query_mistral(prompt, model="mistralai/mistral-7b-instruct", stream=False):
     }
 
     response = requests.post(OPENROUTER_URL, headers=headers, json=data)
-
-    if response.status_code != 200:
-        print("OpenRouter Error:")
-        print("Status Code:", response.status_code)
-        print("Response Text:", response.text)
-        raise Exception("OpenRouter API call failed.")
-
     return response.json()["choices"][0]["message"]["content"].strip()
     
 def customer_agent(customer_id, user_input):
