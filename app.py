@@ -277,9 +277,14 @@ def confirm_order():
     flash("Your order has been placed successfully!", "success")
     return render_template("order_success.html", orders=new_orders, payment_method=payment_method,cid=customer_id)
 
-@app.before_first_request
 def initialize():
     with app.app_context():
-        db.create_all()              
-        load_customer_data()        
-        load_product_data_once() 
+        db.create_all()
+        load_customer_data()
+        load_product_data_once()
+
+initialize()
+
+if __name__ == "__main__":
+    app.run(debug=True)
+ 
