@@ -1,4 +1,5 @@
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy.ext.mutable import MutableList
 from datetime import datetime
 import pytz
 ist = pytz.timezone('Asia/Kolkata')
@@ -12,7 +13,7 @@ class Customer(db.Model):
     Age = db.Column(db.Integer, nullable=True)
     Gender = db.Column(db.String(10), nullable=True)
     Location = db.Column(db.String(100), nullable=True)
-    Browsing_history = db.Column(db.PickleType, default=[])
+    Browsing_history = db.Column(MutableList.as_mutable(db.PickleType), default=list)
     Purchase_history = db.Column(db.String(500), nullable=True)
     CustomerSegment = db.Column(db.String(50), nullable=True)
     Avg_Order_Value = db.Column(db.Float, nullable=True)
@@ -44,7 +45,6 @@ class Cart(db.Model):
     customer = db.relationship('Customer', backref='cart_items')
     product = db.relationship('Products')
 
-
 class Orders(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     customer_id = db.Column(db.Integer, db.ForeignKey('customer.id'), nullable=False)
@@ -62,4 +62,3 @@ class Payments(db.Model):
     amount = db.Column(db.Float, nullable=False)
     payment_method = db.Column(db.String(50), nullable=False)
     status = db.Column(db.String(50), nullable=False)
-    
