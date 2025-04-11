@@ -1,16 +1,26 @@
 import requests
-from models import Customer, Products,Cart
+import os
+from models import Customer, Products, Cart
 from sqlalchemy.orm import joinedload
 
-OLLAMA_API_URL = "http://localhost:11434/api/generate"
+OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY")
+OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions"
 
-def query_mistral(prompt, model="mistral", stream=False):
-        response = requests.post(
-            OLLAMA_API_URL,
-            json={"model": model, "prompt": prompt, "stream": stream},
-        )
-        response.raise_for_status()
-        return response.json().get("response", "").strip()
+def query_mistral(prompt, model="mistral-7b-instruct", stream=False):
+    headers = {
+        "Authorization": f"Bearer {OPENROUTER_API_KEY}",
+        "Content-Type": "application/json"
+    }
+
+    data = {
+        "model": model,
+        "messages": [{"role": "user", "content": prompt}],
+        "stream": stream
+    }
+
+    response = requests.post(OPENROUTER_URL, headers=headers, json=data)
+    response.raise_for_status()
+    return response.json()["choices"][0]["message"]["content"].strip()
     
 def customer_agent(customer_id, user_input):
     customer = Customer.query.filter_by(Customer_Id=customer_id).first()
