@@ -13,13 +13,30 @@ def query_mistral(prompt, model="mistralai/mistral-7b-instruct", stream=False):
     }
 
     data = {
-        "model": f"mistral/{model}",  # Corrected prefix: just "mistral/..." is enough
+        "model": model,
         "messages": [{"role": "user", "content": prompt}],
         "stream": stream
     }
+    try:
+        response = requests.post(OPENROUTER_API_KEY, headers=headers, json=data)
+        # Check HTTP status code
+        if response.status_code != 200:
+            return f"API Error: {response.status_code} - {response.text}"
 
-    response = requests.post(OPENROUTER_URL, headers=headers, json=data)
-    return response.json()["choices"][0]["message"]["content"].strip()
+        response_json = response.json()
+        # Log the full response for debugging
+        print("API Response:", response_json)
+
+        # Check if 'choices' exists
+        if "choices" not in response_json:
+            return f"Unexpected response format: {response_json}"
+
+        return response_json["choices"][0]["message"]["content"].strip()
+
+    except requests.RequestException as e:
+        return f"Request failed: {str(e)}"
+    except ValueError as e:
+        return f"JSON parsing failed: {str(e)}"
     
 def customer_agent(customer_id, user_input):
     customer = Customer.query.filter_by(Customer_Id=customer_id).first()
