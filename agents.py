@@ -6,7 +6,7 @@ from sqlalchemy.orm import joinedload
 OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY")
 OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions"
 
-def query_mistral(prompt, model="mistral-7b-instruct", stream=False):
+def query_mistral(prompt, model="mistralai/mistral-7b-instruct", stream=False):
     headers = {
         "Authorization": f"Bearer {OPENROUTER_API_KEY}",
         "Content-Type": "application/json"
