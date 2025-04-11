@@ -34,7 +34,6 @@ def customer_agent(customer_id, user_input):
     """
     return query_mistral(prompt)
 
-
 def analytics_agent(customer_id=None):
     if customer_id:
         customer = Customer.query.filter_by(Customer_Id=customer_id).first()
@@ -42,29 +41,30 @@ def analytics_agent(customer_id=None):
             return "Customer not found."
 
         prompt = f"""
-        Analyze customer behavior:
-        Segment: {customer.CustomerSegment}
-        Average Order Value: {customer.Avg_Order_Value}
-        Purchase History: {customer.Purchase_history}
-        Browsing History: {customer.Browsing_history}
+You are a customer behavior analysis expert for an E-Commerce platform.
 
-        Give insights and suggestions to improve engagement and retention.
-        """
+Analyze the following customer's behavioral data and provide detailed insights:
+- What patterns do you observe?
+- What does their data suggest about their preferences and buying behavior?
+- What can be done to improve their engagement and convert them into a loyal customer?
+
+Customer Profile:
+Segment: {customer.CustomerSegment}
+Age: {customer.Age}
+Gender: {customer.Gender}
+Location: {customer.Location}
+Average Order Value: ₹{customer.Avg_Order_Value}
+Browsing History: {customer.Browsing_history}
+Purchase History: {customer.Purchase_history}
+
+Also provide:
+1. At least 2 tailored engagement strategies
+2. A short summary of the customer's persona
+"""
+        response = query_mistral(prompt)   
+        return response
     else:
-        all_customers = Customer.query.all()
-        data = ""
-        for c in all_customers:
-            data += f"Segment: {c.CustomerSegment}, AOV: {c.Avg_Order_Value}\n"
-
-        prompt = f"""
-        Here is customer segment and order data:
-        {data}
-
-        Provide insight on best performing segments and strategies for growth.
-        """
-
-    return query_mistral(prompt)
-
+        return "Customer ID is required for analytics."
 
 def recommendation_agent(customer_id):
     customer = Customer.query.options(joinedload(Customer.cart_items)).filter_by(Customer_Id=customer_id).first()
