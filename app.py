@@ -70,8 +70,10 @@ def load_product_data_once():
     print("Products loaded successfully.")
 
 # Routes
-@app.route('/')
+@app.route('/', methods=["GET","HEAD"])
 def index():
+     if request.method == "HEAD":
+        return "", 200
     trending_products = Products.query.order_by(Products.recommendation_prob.desc()).limit(12).all()
     return render_template('index.html', trending_products=trending_products)
 
