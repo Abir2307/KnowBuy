@@ -6,4 +6,3 @@ requests>=2.31
 SQLAlchemy>=2.0.0
 pytz>=2022.7.1
 astunparse
-ollama
