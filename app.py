@@ -5,7 +5,7 @@ from models import db,Customer, Products, Cart, Orders, Payments
 import pytz
 ist = pytz.timezone('Asia/Kolkata')
 import pandas as pd
-from agents import recommendation_agent
+from agents import recommendation_agent,customer_agent,analytics_agent
 import ast 
 
 app = Flask(__name__)
