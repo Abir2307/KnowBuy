@@ -13,13 +13,19 @@ def query_mistral(prompt, model="mistral-7b-instruct", stream=False):
     }
 
     data = {
-        "model": f"openrouter/{model}",
+        "model": f"mistral/{model}",  # Corrected prefix: just "mistral/..." is enough
         "messages": [{"role": "user", "content": prompt}],
         "stream": stream
     }
 
     response = requests.post(OPENROUTER_URL, headers=headers, json=data)
-    response.raise_for_status()
+
+    if response.status_code != 200:
+        print("OpenRouter Error:")
+        print("Status Code:", response.status_code)
+        print("Response Text:", response.text)
+        raise Exception("OpenRouter API call failed.")
+
     return response.json()["choices"][0]["message"]["content"].strip()
     
 def customer_agent(customer_id, user_input):
