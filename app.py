@@ -72,8 +72,6 @@ def load_product_data_once():
 # Routes
 @app.route('/', methods=["GET","HEAD"])
 def index():
-    if request.method == "HEAD":
-        return "", 200
     trending_products = Products.query.order_by(Products.recommendation_prob.desc()).limit(12).all()
     return render_template('index.html', trending_products=trending_products)
 
@@ -87,8 +85,21 @@ def main():
         product_ids = response.split()  # fallback if they're space-separated
 
     recommended_products = Products.query.filter(Products.Product_Id.in_(product_ids)).all()
-
     return render_template('main.html', recommended_products=recommended_products, cid=customer_id)
+
+@app.route('/ask', methods=["POST"])
+def ask_customer_agent():
+    customer_id = request.form.get("cid")
+    user_input = request.form.get("query")
+
+    response = customer_agent(customer_id, user_input)
+    return render_template("ask.html",query=user_input, answer=response, cid=customer_id)
+
+@app.route('/analytics', methods=["POST"])
+def get_analytics():
+    customer_id = request.form.get("cid")
+    result = analytics_agent(customer_id)
+    return render_template("analytics.html", insights=result,cid=customer_id)
 
 @app.route("/signup", methods=["POST"])
 def signup():
@@ -256,8 +267,7 @@ def confirm_order():
             new_orders.append(new_order)
 
     db.session.commit()
-
-    # Create payment record
+    
     if payment_method:
         for order in new_orders:
             payment = Payments(
@@ -271,7 +281,6 @@ def confirm_order():
 
     db.session.commit()
 
-    # Clear cart
     for item in cart_items:
         db.session.delete(item)
     db.session.commit()
