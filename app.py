@@ -104,20 +104,19 @@ def get_analytics():
 
 @app.route("/signup", methods=["POST"])
 def signup():
-    name = request.form["name"]
-    email = request.form["email"]
-    location = request.form["location"]
-    age = int(request.form["age"])
-    holiday = request.form["holiday"]
-    season = request.form["season"]
+    name = request.form.get("name")
+    email = request.form,get("email")
+    location = request.form.get("location")
+    age = int(request.form.get("age"))
+    holiday = request.form.get("holiday")
+    season = request.form.get("season")
 
-    customer_df = pd.read_csv("customer_data_collection.csv")
-
-    # Generate new Customer ID
-    if customer_df["Customer_ID"].str.startswith("C").any():
-        last_cid = customer_df["Customer_ID"].str.extract(r'C(\d+)').astype(int).max()[0]
+    last_customer = Customer.query.order_by(desc(Customer.C_ID)).first()
+    if last_customer and last_customer.C_ID.startswith("C"):
+        last_cid_num = int(last_customer.C_ID[1:])
     else:
-        last_cid = 10999
+        last_cid_num = 10999
+
     new_cid = f"C{last_cid + 1}"
 
     # Append new customer
@@ -320,9 +319,7 @@ def initialize():
         db.create_all()
         load_customer_data()
         load_product_data_once()
-
 initialize()
 
 if __name__ == "__main__":
     app.run(debug=True)
- 
