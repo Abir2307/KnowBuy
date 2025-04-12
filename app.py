@@ -1,6 +1,6 @@
 from flask import Flask, render_template, request, redirect, url_for, flash, session
 from flask_sqlalchemy import SQLAlchemy
-from SQLAlchemy import desc
+from sqlalchemy import desc
 from datetime import datetime
 from models import db,Customer, Products, Cart, Orders, Payments
 import pytz
