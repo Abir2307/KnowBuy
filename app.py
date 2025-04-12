@@ -126,7 +126,7 @@ def signup():
         Age=age,
         Location=location,
         Holiday=holiday,
-        Season=season
+        Season=season,
         CustomerSegment="New Visitor",
         Avg_Order_Value=0.0
     )
