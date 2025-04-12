@@ -247,7 +247,7 @@ def confirm_order():
     if not product_ids:
         flash("Missing order details.", "danger")
         return redirect(url_for('cart'))
-    customer.Purchase_history.append(product.Subcategory)
+    customer = Customer.query.filter_by(Customer_Id=customer_id).first()
     cart_items = Cart.query.filter(Cart.customer_id == customer_id, Cart.product_id.in_(product_ids)).all()
 
     if not cart_items:
@@ -257,11 +257,14 @@ def confirm_order():
     total = 0
     new_orders = []
 
+    history = customer.Purchase_history.split(',') if customer.Purchase_history else []
+    
     for item in cart_items:
         if item.product:
             subtotal = item.quantity * item.product.Price
             total += subtotal
-
+            if product.Subcategory and product.Subcategory not in history:
+                history.append(product.Subcategory)
             new_order = Orders(
                 customer_id=customer_id,
                 product_id=item.product.Product_Id,
@@ -271,7 +274,7 @@ def confirm_order():
             )
             db.session.add(new_order)
             new_orders.append(new_order)
-
+    customer.Purchase_history = ','.join(history)
     db.session.commit()
     
     if payment_method:
