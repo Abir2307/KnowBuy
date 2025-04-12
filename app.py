@@ -27,7 +27,7 @@ def load_customer_data():
             Customer_Id=row['Customer_ID'].strip(),
             Name=row.get('Name'),
             Email=row.get('Email'),
-            Age=int(row['Age']) if pd.notna(row['Age']) else None,
+            Age=int(row['Age']),
             Gender=row.get('Gender'),
             Location=row.get('Location'),
             Browsing_history=row.get('Browsing_history'),
