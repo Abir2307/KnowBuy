@@ -118,7 +118,7 @@ def signup():
     else:
         last_cid_num = 10999
 
-    new_cid = f"C{last_cid + 1}"
+    new_cid = f"C{last_cid_num + 1}"
 
     # Append new customer
     new_customer_db = Customer(
