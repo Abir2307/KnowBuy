@@ -129,13 +129,13 @@ def signup():
         Season=season
         CustomerSegment="New Visitor",
         Avg_Order_Value=0.0
-)
+    )
 
-db.session.add(new_customer_db)
-db.session.commit()
+    db.session.add(new_customer_db)
+    db.session.commit()
 
-
-    return render_template("index.html", signup_message=f"Sign up successful! Your Customer ID is {new_cid}. Please use it to log in.")
+    trending_products = Products.query.order_by(Products.recommendation_prob.desc()).limit(12).all()
+    return render_template("index.html", trending_products-trending_products, signup_message=f"Sign up successful! Your Customer ID is {new_cid}. Please use it to log in.")
 
 @app.route("/signin", methods=["POST"])
 def login():
@@ -280,11 +280,36 @@ def confirm_order():
                 status="Success"
             )
             db.session.add(payment)
-
     db.session.commit()
 
     for item in cart_items:
         db.session.delete(item)
+    db.session.commit()
+    
+    customer = Customer.query.filter_by(Customer_Id=customer_id).first()
+    if customer:
+        order_ids = [order.id for order in Orders.query.filter_by(customer_id=customer_id).all()]
+        payments = Payments.query.filter(
+            Payments.order_id.in_(order_ids),
+            Payments.status == "Success"
+        ).all()
+    if payments:
+            total_paid = sum(p.amount for p in payments)
+            unique_order_times = set(p.payment_date.strftime("%Y-%m-%d %H:%M") for p in payments)
+            num_orders = len(unique_order_times)
+            avg_order_value = total_paid / num_orders
+            customer.Avg_Order_Value = round(avg_order_value, 2)
+        
+            from datetime import timedelta
+            cutoff = datetime.now(ist) - timedelta(days=20)
+            recent_payments = [p for p in payments if p.payment_date >= cutoff]
+
+            if len(recent_payments) >= 4:
+                customer.CustomerSegment = "Frequent Buyer"
+            elif len(recent_payments) >= 2:
+                customer.CustomerSegment = "Occasional Shopper"
+            else:
+                customer.CustomerSegment = "New Visitor"
     db.session.commit()
 
     flash("Your order has been placed successfully!", "success")
