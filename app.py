@@ -105,7 +105,7 @@ def get_analytics():
 @app.route("/signup", methods=["POST"])
 def signup():
     name = request.form.get("name")
-    email = request.form,get("email")
+    email = request.form.get("email")
     location = request.form.get("location")
     age = int(request.form.get("age"))
     holiday = request.form.get("holiday")
