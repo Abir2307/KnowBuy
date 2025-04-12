@@ -112,9 +112,9 @@ def signup():
     holiday = request.form.get("holiday")
     season = request.form.get("season")
 
-    last_customer = Customer.query.order_by(desc(Customer.C_ID)).first()
-    if last_customer and last_customer.C_ID.startswith("C"):
-        last_cid_num = int(last_customer.C_ID[1:])
+    last_customer = Customer.query.order_by(desc(Customer.Customer_Id)).first()
+    if last_customer and last_customer.Customer_Id.startswith("C"):
+        last_cid_num = int(last_customer.Customer_Id[1:])
     else:
         last_cid_num = 10999
 
