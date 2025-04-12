@@ -109,29 +109,33 @@ def signup():
     email = request.form.get("email")
     location = request.form.get("location")
     age = int(request.form.get("age"))
+    gender = int(request.form.get("gender")
     holiday = request.form.get("holiday")
     season = request.form.get("season")
 
-    last_customer = Customer.query.order_by(desc(Customer.Customer_Id)).first()
+    last_customer = Customer.query.order_by(Customer.id.desc()).first()
     if last_customer and last_customer.Customer_Id.startswith("C"):
         last_cid_num = int(last_customer.Customer_Id[1:])
     else:
         last_cid_num = 10999
-
     new_cid = f"C{last_cid_num + 1}"
 
-    # Append new customer
-    new_customer_db = Customer(
+    new_customer = Customer(
         Customer_Id=new_cid,
+        Name=name,
+        Email=email,
         Age=age,
+        Gender=gender,
         Location=location,
-        Holiday=holiday,
-        Season=season,
+        Browsing_history=[],
+        Purchase_history=[],
         CustomerSegment="New Visitor",
-        Avg_Order_Value=0.0
+        Avg_Order_Value=0.0,
+        Holiday=holiday,
+        Season=season
     )
 
-    db.session.add(new_customer_db)
+    db.session.add(new_customer)
     db.session.commit()
 
     trending_products = Products.query.order_by(Products.recommendation_prob.desc()).limit(12).all()
@@ -243,7 +247,7 @@ def confirm_order():
     if not product_ids:
         flash("Missing order details.", "danger")
         return redirect(url_for('cart'))
-
+    customer.Purchase_history.append(product.Subcategory)
     cart_items = Cart.query.filter(Cart.customer_id == customer_id, Cart.product_id.in_(product_ids)).all()
 
     if not cart_items:
