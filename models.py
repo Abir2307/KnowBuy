@@ -14,7 +14,7 @@ class Customer(db.Model):
     Gender = db.Column(db.String(10), nullable=True)
     Location = db.Column(db.String(100), nullable=True)
     Browsing_history = db.Column(MutableList.as_mutable(db.PickleType), default=list)
-    Purchase_history = db.Column(db.string(500), nullable=True)
+    Purchase_history = db.Column(db.String(500), nullable=True)
     CustomerSegment = db.Column(db.String(50), nullable=True)
     Avg_Order_Value = db.Column(db.Float, nullable=True)
     Holiday = db.Column(db.String(50), nullable=True)
