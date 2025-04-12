@@ -175,9 +175,11 @@ def search_products():
 def add_to_cart():
     customer_id = request.form.get('customer_id')
     product_id = request.form.get('product_id')
+    
     customer = Customer.query.filter_by(Customer_Id=customer_id).first()
     product = Products.query.filter_by(Product_Id=product_id).first()
-    existing_item = Cart.query.filter_by(customer_id= customer_id, product_id=product_id).first()
+    
+    existing_item = Cart.query.filter_by(customer_id=customer_id, product_id=product_id).first()
     if existing_item:
         existing_item.quantity += 1
         flash("Product quantity updated in cart!")
@@ -185,8 +187,11 @@ def add_to_cart():
         new_item = Cart(customer_id=customer_id, product_id=product_id, quantity=1)
         db.session.add(new_item)
         flash("Product added to cart!")
-        if product.Category and product.Category not in customer.Browsing_history:
-            customer.Browsing_history.append(product.Category)
+        if product.Category:
+            history = customer.Browsing_history.split(',') if customer.Browsing_history else []
+            if product.Category not in history:
+                history.append(product.Category)
+                customer.Browsing_history = ','.join(history)
     db.session.commit()
     return redirect(url_for('view_cart', customer_id=customer_id))
 
