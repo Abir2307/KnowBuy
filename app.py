@@ -121,18 +121,19 @@ def signup():
     new_cid = f"C{last_cid + 1}"
 
     # Append new customer
-    new_customer = {
-        "Customer_ID": new_cid,
-        "Name": name,
-        "Email": email,
-        "Location": location,
-        "Age": age,
-        "Holiday": holiday,
-        "Season": season
-    }
+    new_customer_db = Customer(
+        Customer_Id=new_cid,
+        Age=age,
+        Location=location,
+        Holiday=holiday,
+        Season=season
+        CustomerSegment="New Visitor",
+        Avg_Order_Value=0.0
+)
 
-    customer_df = pd.concat([customer_df, pd.DataFrame([new_customer])], ignore_index=True)
-    customer_df.to_csv("customer_data_collection.csv", index=False)
+db.session.add(new_customer_db)
+db.session.commit()
+
 
     return render_template("index.html", signup_message=f"Sign up successful! Your Customer ID is {new_cid}. Please use it to log in.")
 
