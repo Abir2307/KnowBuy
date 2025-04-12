@@ -139,7 +139,7 @@ def signup():
     db.session.commit()
 
     trending_products = Products.query.order_by(Products.recommendation_prob.desc()).limit(12).all()
-    return render_template("index.html", trending_products-trending_products, signup_message=f"Sign up successful! Your Customer ID is {new_cid}. Please use it to log in.")
+    return render_template("index.html", trending_products=trending_products, signup_message=f"Sign up successful! Your Customer ID is {new_cid}. Please use it to log in.")
 
 @app.route("/signin", methods=["POST"])
 def login():
