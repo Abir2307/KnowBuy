@@ -109,7 +109,7 @@ def signup():
     email = request.form.get("email")
     location = request.form.get("location")
     age = int(request.form.get("age"))
-    gender = int(request.form.get("gender")
+    gender = request.form.get("gender")
     holiday = request.form.get("holiday")
     season = request.form.get("season")
 
