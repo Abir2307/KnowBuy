@@ -11,6 +11,6 @@ services:
     disk:
       name: knowbuy-disk
       mountPath: /data
-      sizeGB: 2
+      sizeGB: 1
     build:
       pythonVersion: 3.10
