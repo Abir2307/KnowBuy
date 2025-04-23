@@ -8,5 +8,9 @@ services:
       - key: OPENROUTER_API_KEY
         sync: false 
     plan: free
+    disk:
+      name: knowbuy-disk
+      mountPath: /data
+      sizeGB: 1
     build:
       pythonVersion: 3.10
