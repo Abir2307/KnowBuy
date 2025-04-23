@@ -4,6 +4,7 @@ from sqlalchemy import desc
 from datetime import datetime
 from models import db,Customer, Products, Cart, Orders, Payments
 import pytz
+import os
 ist = pytz.timezone('Asia/Kolkata')
 import pandas as pd
 from agents import recommendation_agent,customer_agent,analytics_agent
@@ -328,10 +329,14 @@ def confirm_order():
     return render_template("order_success.html", orders=new_orders, payment_method=payment_method,cid=customer_id)
 
 def initialize():
+    # Ensure the app context is properly handled
     with app.app_context():
-        db.create_all()
+        # Check if the database file exists before creating it
+        if not os.path.exists('/data/KnowBuy.sqlite3'):
+            db.create_all()  
         load_customer_data()
         load_product_data_once()
+
 initialize()
 
 if __name__ == "__main__":
