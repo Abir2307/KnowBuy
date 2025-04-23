@@ -1,8 +1,6 @@
 from flask import Flask, render_template, request, redirect, url_for, flash, session
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import desc
-from datetime import datetime
-import os
 from models import db,Customer, Products, Cart, Orders, Payments
 import pytz
 ist = pytz.timezone('Asia/Kolkata')
@@ -11,7 +9,7 @@ from agents import recommendation_agent,customer_agent,analytics_agent
 import ast 
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////mnt/data/KnowBuy.sqlite3'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///KnowBuy.sqlite3'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.secret_key = 'secret_key'
 
@@ -331,10 +329,7 @@ def confirm_order():
 def initialize():
     # Ensure the app context is properly handled
     with app.app_context():
-        # Check if the database file exists before creating it
-        db_path = '/mnt/data/KnowBuy.sqlite3'  # Updated path for Render persistent storage
-        if not os.path.exists(db_path):
-            db.create_all()  # Create tables if the database doesn't exist
+            db.create_all() 
         load_customer_data()
         load_product_data_once()
 
