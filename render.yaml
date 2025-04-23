@@ -10,7 +10,7 @@ services:
     plan: free
     disk:
       name: knowbuy-disk
-      mountPath: /data
+      mountPath: /mnt/data
       sizeGB: 1
     build:
       pythonVersion: 3.10
