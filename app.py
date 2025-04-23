@@ -20,8 +20,9 @@ db.init_app(app)
 def load_customer_data():
     if Customer.query.first():
         return
-
+        
     df = pd.read_csv("customer_data_collection.csv")
+    
     for _, row in df.iterrows():
         customer = Customer(
             Customer_Id=row['Customer_ID'].strip(),
