@@ -329,7 +329,7 @@ def confirm_order():
 def initialize():
     # Ensure the app context is properly handled
     with app.app_context():
-            db.create_all() 
+        db.create_all() 
         load_customer_data()
         load_product_data_once()
 
