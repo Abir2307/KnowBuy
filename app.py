@@ -19,8 +19,7 @@ db.init_app(app)
 # Data Loaders
 def load_customer_data():
     if Customer.query.first():
-        return
-        
+        return    
     df = pd.read_csv("customer_data_collection.csv")
     
     for _, row in df.iterrows():
