@@ -312,9 +312,9 @@ def confirm_order():
             avg_order_value = total_paid / num_orders
             customer.Avg_Order_Value = round(avg_order_value, 2)
         
-            cutoff = datetime.now(ist) - timedelta(days=20)
+            cutoff = (datetime.now(ist) - timedelta(days=20)).replace(tzinfo=None)
             recent_payments = [p for p in payments if p.payment_date >= cutoff]
-
+        
             if len(recent_payments) >= 4:
                 customer.CustomerSegment = "Frequent Buyer"
             elif len(recent_payments) >= 2:
@@ -337,5 +337,6 @@ initialize()
 
 if __name__ == "__main__":
     app.run(debug=True)
+
 
 
