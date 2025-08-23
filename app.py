@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, redirect, url_for, flash, session
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import desc
+from datetime import datetime, timedelta
 from models import db,Customer, Products, Cart, Orders, Payments
 import pytz
 ist = pytz.timezone('Asia/Kolkata')
@@ -267,8 +268,8 @@ def confirm_order():
         if item.product:
             subtotal = item.quantity * item.product.Price
             total += subtotal
-            if product.Subcategory and product.Subcategory not in history:
-                history.append(product.Subcategory)
+            if item.product.Subcategory and item.product.Subcategory not in history:
+                history.append(item.product.Subcategory)
             new_order = Orders(
                 customer_id=customer_id,
                 product_id=item.product.Product_Id,
@@ -311,7 +312,6 @@ def confirm_order():
             avg_order_value = total_paid / num_orders
             customer.Avg_Order_Value = round(avg_order_value, 2)
         
-            from datetime import timedelta
             cutoff = datetime.now(ist) - timedelta(days=20)
             recent_payments = [p for p in payments if p.payment_date >= cutoff]
 
@@ -337,3 +337,4 @@ initialize()
 
 if __name__ == "__main__":
     app.run(debug=True)
+
