@@ -324,7 +324,7 @@ def confirm_order():
     db.session.commit()
 
     flash("Your order has been placed successfully!", "success")
-    return render_template("order_success.html", orders=new_orders, payment_method=payment_method,cid=customer_id)
+    return render_template("order_success.html", new_orders=new_orders, payment_method=payment_method, cid=customer_id)
 
 def initialize():
     # Ensure the app context is properly handled
@@ -337,4 +337,5 @@ initialize()
 
 if __name__ == "__main__":
     app.run(debug=True)
+
 
