@@ -6,30 +6,41 @@ from sqlalchemy.orm import joinedload
 OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY")
 OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions"
 
-def query_mistral(prompt, model="mistralai/mistral-7b-instruct", stream=False):
+def query_mistral(prompt, model="mistralai/mistral-small-latest", stream=False):
     headers = {
         "Authorization": f"Bearer {OPENROUTER_API_KEY}",
         "Content-Type": "application/json"
     }
 
-    data = {
+    payload = {
         "model": model,
-        "messages": [{"role": "user", "content": prompt}],
+        "messages": [
+            {"role": "user", "content": prompt}
+        ],
         "stream": stream
     }
+
     try:
-        response = requests.post(OPENROUTER_URL, headers=headers, json=data)
-        response_json = response.json()
-        
-        if "choices" not in response_json:
-            return f"Unexpected response format: {response_json}"
+        response = requests.post(
+            OPENROUTER_URL,
+            headers=headers,
+            json=payload
+        )
 
-        return response_json["choices"][0]["message"]["content"].strip()
+        print("Status:", response.status_code)
+        print("Raw:", response.text)
 
-    except requests.RequestException as e:
-        return f"Request failed: {str(e)}"
-    except ValueError as e:
-        return f"JSON parsing failed: {str(e)}"
+        response.raise_for_status()
+
+        data = response.json()
+
+        return data["choices"][0]["message"]["content"]
+
+    except requests.exceptions.HTTPError as e:
+        return f"HTTP Error: {e} | {response.text}"
+
+    except Exception as e:
+        return f"Error: {str(e)}"
     
 def customer_agent(customer_id, user_input):
     customer = Customer.query.filter_by(Customer_Id=customer_id).first()
