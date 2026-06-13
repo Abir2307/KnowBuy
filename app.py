@@ -104,6 +104,13 @@ def get_analytics():
     return render_template("analytics.html", insights=result,cid=customer_id)
 
 @app.route("/signup", methods=["POST"])
+import secrets
+
+def generate_cid():
+    return "C" + secrets.token_hex(6).upper()
+
+
+@app.route("/signup", methods=["POST"])
 def signup():
     name = request.form.get("name")
     email = request.form.get("email")
@@ -113,12 +120,11 @@ def signup():
     holiday = request.form.get("holiday")
     season = request.form.get("season")
 
-    last_customer = Customer.query.order_by(Customer.id.desc()).first()
-    if last_customer and last_customer.Customer_Id.startswith("C"):
-        last_cid_num = int(last_customer.Customer_Id[1:])
-    else:
-        last_cid_num = 10999
-    new_cid = f"C{last_cid_num + 1}"
+    new_cid = generate_cid()
+
+    # ensure uniqueness (important)
+    while Customer.query.filter_by(Customer_Id=new_cid).first():
+        new_cid = generate_cid()
 
     new_customer = Customer(
         Customer_Id=new_cid,
@@ -138,9 +144,15 @@ def signup():
     db.session.add(new_customer)
     db.session.commit()
 
-    trending_products = Products.query.order_by(Products.recommendation_prob.desc()).limit(12).all()
-    return render_template("index.html", trending_products=trending_products, signup_message=f"Sign up successful! Your Customer ID is {new_cid}. Please use it to log in.")
+    trending_products = Products.query.order_by(
+        Products.recommendation_prob.desc()
+    ).limit(12).all()
 
+    return render_template(
+        "index.html",
+        trending_products=trending_products,
+        signup_message=f"Sign up successful! Your Customer ID is {new_cid}. Please use it to log in."
+    )
 @app.route("/signin", methods=["POST"])
 def login():
     customer_id = request.form.get("customer_id")
