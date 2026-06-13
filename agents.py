@@ -107,21 +107,38 @@ def recommendation_agent(customer_id):
         product_info += f"ID: {p.Product_Id}, Brand: {p.Brand}, Category: {p.Category}, Rating: {p.Product_Rating}, Holiday: {p.Holiday}, Season: {p.Season}\n"
 
     prompt = f"""
-    You are a recommendation engine.
-
-    Customer Details:
+    You are a personalized recommendation engine.
+    
+    Customer Profile:
     Age: {customer.Age}
     Gender: {customer.Gender}
     Location: {customer.Location}
     Segment: {customer.CustomerSegment}
-    Purchase History: {customer.Purchase_history}
-    Browsing History: {customer.Browsing_history}
-
+    
+    Purchase History:
+    {customer.Purchase_history}
+    
+    Browsing History:
+    {customer.Browsing_history}
+    
     Product Catalog:
     {product_info}
-
-    Based on this, return a list of 20 Product_IDs that are most relevant to the customer.
-    Format your answer as a Python list of strings. Example: ["P2001", "P2005"]
+    
+    Rules:
+    
+    1. Prioritize products similar to the customer's browsing history.
+    2. Prioritize products similar to previously purchased products.
+    3. Use customer age, gender, location and segment when relevant.
+    4. Do NOT recommend products solely because they have high ratings.
+    5. Avoid generic or globally popular recommendations.
+    6. Maximize personalization.
+    7. Recommend products from categories and brands the customer has previously interacted with.
+    8. Only recommend products that are strongly relevant to the customer profile.
+    
+    Return exactly 20 Product_IDs as a Python list.
+    
+    Example:
+    ["P1001","P1002"]
     """
-
+    
     return query_mistral(prompt)
