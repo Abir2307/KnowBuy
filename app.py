@@ -7,7 +7,8 @@ import pytz
 ist = pytz.timezone('Asia/Kolkata')
 import pandas as pd
 from agents import recommendation_agent,customer_agent,analytics_agent
-import ast 
+import ast
+import secrets
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///KnowBuy.sqlite3'
@@ -102,10 +103,7 @@ def get_analytics():
     customer_id = request.form.get("cid")
     result = analytics_agent(customer_id)
     return render_template("analytics.html", insights=result,cid=customer_id)
-
-@app.route("/signup", methods=["POST"])
-import secrets
-
+    
 def generate_cid():
     return "C" + secrets.token_hex(6).upper()
 
