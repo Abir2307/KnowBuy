@@ -239,8 +239,22 @@ def view_cart(customer_id):
 
 @app.route('/view_orders/<customer_id>')
 def view_orders(customer_id):
-    orders = Orders.query.filter_by(customer_id=customer_id).all()
-    return render_template('view_orders.html', orders=orders, cid=customer_id)
+
+    customer = Customer.query.filter_by(
+        Customer_Id=customer_id
+    ).first()
+
+    if not customer:
+        return "Customer not found"
+
+    orders = Orders.query.filter_by(
+        customer_id=customer.id
+    ).all()
+
+    return render_template(
+        "orders.html",
+        orders=orders
+    )
 
 @app.route('/checkout', methods=['POST'])
 def checkout():
