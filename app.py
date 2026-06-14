@@ -300,8 +300,8 @@ def confirm_order():
             if item.product.Subcategory and item.product.Subcategory not in history:
                 history.append(item.product.Subcategory)
             new_order = Orders(
-                customer_id=customer_id,
-                product_id=item.product.Product_Id,
+                customer_id=customer.id,
+                product_id=item.product.id,
                 quantity=item.quantity,
                 total_price=subtotal,
                 order_date=datetime.now(ist)
@@ -329,7 +329,7 @@ def confirm_order():
     
     customer = Customer.query.filter_by(Customer_Id=customer_id).first()
     if customer:
-        order_ids = [order.id for order in Orders.query.filter_by(customer_id=customer_id).all()]
+        order_ids = [order.id for order in Orders.query.filter_by(customer_id=customer.id).all()]
         payments = Payments.query.filter(
             Payments.order_id.in_(order_ids),
             Payments.status == "Success"
