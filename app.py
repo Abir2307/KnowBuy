@@ -253,7 +253,8 @@ def view_orders(customer_id):
 
     return render_template(
         "view_orders.html",
-        orders=orders
+        orders=orders,
+        cid=customer.Customer_Id
     )
 
 @app.route('/checkout', methods=['POST'])
