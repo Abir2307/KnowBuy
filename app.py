@@ -252,7 +252,7 @@ def view_orders(customer_id):
     ).all()
 
     return render_template(
-        "orders.html",
+        "view_orders.html",
         orders=orders
     )
 
