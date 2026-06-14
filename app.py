@@ -278,42 +278,73 @@ def confirm_order():
     customer_id = request.form.get('customer_id')
     product_ids = request.form.getlist('product_id')
     payment_method = request.form.get('payment_method')
-
+    
     if not product_ids:
         flash("Missing order details.", "danger")
         return redirect(url_for('cart'))
-    customer = Customer.query.filter_by(Customer_Id=customer_id).first()
-    cart_items = Cart.query.filter(Cart.customer_id == customer_id, Cart.product_id.in_(product_ids)).all()
-
+    
+    customer = Customer.query.filter_by(
+        Customer_Id=customer_id
+    ).first()
+    
+    if not customer:
+        flash("Customer not found.", "danger")
+        return redirect(url_for('index'))
+    
+    cart_items = Cart.query.filter(
+        Cart.customer_id == customer_id,
+        Cart.product_id.in_(product_ids)
+    ).all()
+    
     if not cart_items:
         flash("Cart is empty or items missing.", "warning")
-        return redirect(url_for('view_cart', customer_id=customer_id))
-
-    total = 0
+        return redirect(
+            url_for(
+                'view_cart',
+                customer_id=customer_id
+            )
+        )
+    
     new_orders = []
-
-    history = customer.Purchase_history.split(',') if customer.Purchase_history else []
+    
+    history = (
+        customer.Purchase_history.split(',')
+        if customer.Purchase_history
+        else []
+    )
     
     for item in cart_items:
-        if item.product:
-            subtotal = item.quantity * item.product.Price
-            total += subtotal
-            if item.product.Subcategory and item.product.Subcategory not in history:
-                history.append(item.product.Subcategory)
-            new_order = Orders(
-                customer_id=customer.id,
-                product_id=item.product.id,
-                quantity=item.quantity,
-                total_price=subtotal,
-                order_date=datetime.now(ist)
-            )
-            db.session.add(new_order)
-            new_orders.append(new_order)
-    customer.Purchase_history = ','.join(history)
-    db.session.commit()
+    
+        if not item.product:
+            continue
+    
+        subtotal = item.quantity * item.product.Price
+    
+        if (
+            item.product.Subcategory
+            and item.product.Subcategory not in history
+        ):
+            history.append(item.product.Subcategory)
+    
+        new_order = Orders(
+            customer_id=customer.id,
+            product_id=item.product.id,
+            quantity=item.quantity,
+            total_price=subtotal,
+            order_date=datetime.now(ist)
+        )
+    
+        db.session.add(new_order)
+        new_orders.append(new_order)
+    
+    customer.Purchase_history = ",".join(history)
+    
+    db.session.flush()
     
     if payment_method:
+    
         for order in new_orders:
+    
             payment = Payments(
                 order_id=order.id,
                 amount=order.total_price,
@@ -321,41 +352,74 @@ def confirm_order():
                 payment_date=datetime.now(ist),
                 status="Success"
             )
+    
             db.session.add(payment)
-    db.session.commit()
-
+    
     for item in cart_items:
         db.session.delete(item)
+    
+   order_ids = [order.id for order in customer.orders]
+    
+    payments = Payments.query.filter(
+        Payments.order_id.in_(order_ids),
+        Payments.status == "Success"
+    ).all()
+    
+    if payments:
+    
+        total_paid = sum(
+            payment.amount
+            for payment in payments
+        )
+    
+        unique_order_times = set(
+            payment.payment_date.strftime(
+                "%Y-%m-%d %H:%M"
+            )
+            for payment in payments
+        )
+    
+        num_orders = max(
+            len(unique_order_times),
+            1
+        )
+    
+        customer.Avg_Order_Value = round(
+            total_paid / num_orders,
+            2
+        )
+    
+        cutoff = (
+            datetime.now(ist)
+            - timedelta(days=20)
+        )
+    
+        recent_payments = [
+            payment
+            for payment in payments
+            if payment.payment_date >= cutoff
+        ]
+    
+        if len(recent_payments) >= 4:
+            customer.CustomerSegment = "Frequent Buyer"
+        elif len(recent_payments) >= 2:
+            customer.CustomerSegment = "Occasional Shopper"
+        else:
+            customer.CustomerSegment = "New Visitor"
+    
     db.session.commit()
     
-    customer = Customer.query.filter_by(Customer_Id=customer_id).first()
-    if customer:
-        order_ids = [order.id for order in Orders.query.filter_by(customer_id=customer.id).all()]
-        payments = Payments.query.filter(
-            Payments.order_id.in_(order_ids),
-            Payments.status == "Success"
-        ).all()
-    if payments:
-            total_paid = sum(p.amount for p in payments)
-            unique_order_times = set(p.payment_date.strftime("%Y-%m-%d %H:%M") for p in payments)
-            num_orders = len(unique_order_times)
-            avg_order_value = total_paid / num_orders
-            customer.Avg_Order_Value = round(avg_order_value, 2)
-        
-            cutoff = (datetime.now(ist) - timedelta(days=20)).replace(tzinfo=None)
-            recent_payments = [p for p in payments if p.payment_date >= cutoff]
-        
-            if len(recent_payments) >= 4:
-                customer.CustomerSegment = "Frequent Buyer"
-            elif len(recent_payments) >= 2:
-                customer.CustomerSegment = "Occasional Shopper"
-            else:
-                customer.CustomerSegment = "New Visitor"
-    db.session.commit()
-
-    flash("Your order has been placed successfully!", "success")
-    return render_template("order_success.html", new_orders=new_orders, payment_method=payment_method, cid=customer_id)
-
+    flash(
+        "Your order has been placed successfully!",
+        "success"
+    )
+    
+    return render_template(
+        "order_success.html",
+        new_orders=new_orders,
+        payment_method=payment_method,
+        cid=customer_id
+    )
 def initialize():
     # Ensure the app context is properly handled
     with app.app_context():
