@@ -2,11 +2,11 @@ from flask import Flask, render_template, request, redirect, url_for, flash, ses
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import desc
 from datetime import datetime, timedelta
-from models import db,Customer, Products, Cart, Orders, Payments
+from models import db, Customer, Products, Cart, Orders, Payments
 import pytz
 ist = pytz.timezone('Asia/Kolkata')
 import pandas as pd
-from agents import recommendation_agent,customer_agent,analytics_agent
+from agents import recommendation_agent, customer_agent, analytics_agent
 import ast
 import secrets
 import os
@@ -101,17 +101,16 @@ def ask_customer_agent():
     user_input = request.form.get("query")
 
     response = customer_agent(customer_id, user_input)
-    return render_template("ask.html",query=user_input, answer=response, cid=customer_id)
+    return render_template("ask.html", query=user_input, answer=response, cid=customer_id)
 
 @app.route('/analytics', methods=["POST"])
 def get_analytics():
     customer_id = request.form.get("cid")
     result = analytics_agent(customer_id)
-    return render_template("analytics.html", insights=result,cid=customer_id)
+    return render_template("analytics.html", insights=result, cid=customer_id)
     
 def generate_cid():
     return "C" + secrets.token_hex(6).upper()
-
 
 @app.route("/signup", methods=["POST"])
 def signup():
@@ -156,6 +155,7 @@ def signup():
         trending_products=trending_products,
         signup_message=f"Sign up successful! Your Customer ID is {new_cid}. Please use it to log in."
     )
+
 @app.route("/signin", methods=["POST"])
 def login():
     customer_id = request.form.get("customer_id")
@@ -163,9 +163,7 @@ def login():
     if customer:
         trending_products = Products.query.order_by(Products.recommendation_prob.desc()).limit(12).all()
         return render_template('loggedin.html', trending_products=trending_products, cid=customer.Customer_Id)
-
     else:
-        
         trending_products = Products.query.order_by(Products.recommendation_prob.desc()).limit(12).all()
         return render_template('index.html', trending_products=trending_products)
 
@@ -177,14 +175,14 @@ def logout():
 def search_products():
     customer_id = request.form.get("cid")
     search_term = request.form.get("prod", "").strip()
-    number_of_results = int(request.form.get("nbr")or 12) 
+    number_of_results = int(request.form.get("nbr") or 12) 
 
     matching_products = Products.query.filter(
         (Products.Brand.ilike(f"%{search_term}%")) |
         (Products.Category.ilike(f"%{search_term}%")) |
         (Products.Subcategory.ilike(f"%{search_term}%"))
     ).limit(number_of_results).all()
-    return render_template("search.html", results=matching_products,cid=customer_id)
+    return render_template("search.html", results=matching_products, cid=customer_id)
 
 @app.route('/add_to_cart', methods=['POST'])
 def add_to_cart():
@@ -215,8 +213,8 @@ def remove_from_cart():
     customer_id = request.form.get('customer_id')
     product_id = request.form.get('product_id')
 
-    existing_item = Cart.query.filter_by(customer_id= customer_id, product_id=product_id).first()
-    if existing_item.quantity>1:
+    existing_item = Cart.query.filter_by(customer_id=customer_id, product_id=product_id).first()
+    if existing_item.quantity > 1:
         existing_item.quantity -= 1
         flash("One unit removed from cart.")
     else:
@@ -239,7 +237,6 @@ def view_cart(customer_id):
 
 @app.route('/view_orders/<customer_id>')
 def view_orders(customer_id):
-
     customer = Customer.query.filter_by(
         Customer_Id=customer_id
     ).first()
@@ -306,7 +303,6 @@ def confirm_order():
         )
     
     new_orders = []
-    
     history = (
         customer.Purchase_history.split(',')
         if customer.Purchase_history
@@ -314,7 +310,6 @@ def confirm_order():
     )
     
     for item in cart_items:
-    
         if not item.product:
             continue
     
@@ -338,13 +333,10 @@ def confirm_order():
         new_orders.append(new_order)
     
     customer.Purchase_history = ",".join(history)
-    
     db.session.flush()
     
     if payment_method:
-    
         for order in new_orders:
-    
             payment = Payments(
                 order_id=order.id,
                 amount=order.total_price,
@@ -352,13 +344,12 @@ def confirm_order():
                 payment_date=datetime.now(ist),
                 status="Success"
             )
-    
             db.session.add(payment)
     
     for item in cart_items:
         db.session.delete(item)
     
-   order_ids = [order.id for order in customer.orders]
+    order_ids = [order.id for order in customer.orders]
     
     payments = Payments.query.filter(
         Payments.order_id.in_(order_ids),
@@ -366,7 +357,6 @@ def confirm_order():
     ).all()
     
     if payments:
-    
         total_paid = sum(
             payment.amount
             for payment in payments
@@ -420,6 +410,7 @@ def confirm_order():
         payment_method=payment_method,
         cid=customer_id
     )
+
 def initialize():
     # Ensure the app context is properly handled
     with app.app_context():
@@ -431,6 +422,3 @@ initialize()
 
 if __name__ == "__main__":
     app.run(debug=True)
-
-
-
